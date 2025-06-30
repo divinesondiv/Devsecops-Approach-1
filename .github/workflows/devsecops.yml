@@ -1,25 +1,19 @@
-name: Hello World DevSecOps
-
+name: Build
 on:
   push:
     branches:
       - master
-
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
-  build:
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Say Hello
-        run: echo "GitHub Actions works! 🚀"
-
-      # OPTIONAL: Install dependencies (use only if you have package.json)
-      # - name: Install Dependencies
-      #   run: npm install
-
-      - name: SAST with SonarCloud (Updated)
-        uses: SonarSource/sonarqube-scan-action@v5.0.0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
