@@ -9,18 +9,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Say Hello
-      run: echo "GitHub Actions works! 🚀"
+      - name: Say Hello
+        run: echo "GitHub Actions works! 🚀"
 
-- name: Install Dependencies
-      run: npm install
+      # OPTIONAL: Install dependencies (use only if you have package.json)
+      # - name: Install Dependencies
+      #   run: npm install
 
-- name: SAST with SonarCloud
-  uses: sonarsource/sonarcloud-github-action@master
-  with:
-    projectBaseDir: .
-  env:
-    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    SONAR_PROJECT_KEY: divinesondiv_Devsecops-Approach-1
-    SONAR_ORGANIZATION: divinesondiv
-
+      - name: SAST with SonarCloud
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: divinesondiv_Devsecops-Approach-1
+          SONAR_ORGANIZATION: divinesondiv
