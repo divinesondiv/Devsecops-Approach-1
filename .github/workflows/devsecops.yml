@@ -1,0 +1,13 @@
+name: Hello World DevSecOps
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Say Hello
+      run: echo "GitHub Actions works! 🚀"
