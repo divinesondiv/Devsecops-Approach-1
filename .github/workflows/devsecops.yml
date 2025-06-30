@@ -35,17 +35,19 @@ jobs:
           name: dependency-check-report
           path: reports/dependency-check-report.html
 
-      # 3. SonarQube - Code Quality and SAST
+      # 3. SonarCloud - Code Quality and SAST
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: .
-            container-scan:
-    - name: Trivy Container Scan
-      runs-on: ubuntu-latest
-      steps:
+
+  container-scan:
+    name: Trivy Container Scan
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
@@ -56,19 +58,10 @@ jobs:
         run: docker build -t myapp:latest .
 
       - name: Run Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: myapp:latest
-          format: table
-          exit-code: 0  # use 1 if you want to fail the build on vulnerabilities
-          ignore-unfixed: true
+        run: trivy image --severity HIGH,CRITICAL --no-progress --format table -o trivy-report.txt myapp:latest
 
       - name: Upload Trivy report
         uses: actions/upload-artifact@v4
         with:
           name: trivy-report
           path: trivy-report.txt
-
-
-
-    
