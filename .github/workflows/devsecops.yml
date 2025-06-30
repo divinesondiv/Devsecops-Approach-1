@@ -11,3 +11,16 @@ jobs:
     steps:
     - name: Say Hello
       run: echo "GitHub Actions works! 🚀"
+
+- name: Install Dependencies
+      run: npm install
+
+- name: SAST with SonarCloud
+  uses: sonarsource/sonarcloud-github-action@master
+  with:
+    projectBaseDir: .
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_PROJECT_KEY: divinesondiv_Devsecops-Approach-1
+    SONAR_ORGANIZATION: divinesondiv
+
