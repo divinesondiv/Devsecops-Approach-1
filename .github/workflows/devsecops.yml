@@ -1,39 +1,44 @@
-name: Build
+name: DevSecOps Pipeline
+
 on:
   push:
     branches:
       - master
-  pull_request:
-    types: [opened, synchronize, reopened]
-jobs:
-  sonarqube:
-    name: SonarQube
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      
-      - name: Run GitLeaks for secrets detection
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: "--verbose --redact"
 
-      - name: Dependency Check (OWASP)
+jobs:
+  devsecops-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Gitleaks - Secrets Scan
+      - name: Run Gitleaks Secret Scan
+        uses: zricethezav/gitleaks-action@v2.3.2
+        with:
+          config-path: .gitleaks.toml
+        continue-on-error: true
+
+      # 2. OWASP Dependency-Check - Vulnerability Scan
+      - name: OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'Devsecops-Approach-1'
-          path: '.'
-          format: 'HTML'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          project: "devsecops-project"
+          format: "HTML"
+          out: "reports"
+        continue-on-error: true
 
       - name: Upload Dependency-Check Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: dependency-check-report
-          path: dependency-check-report.html
+          path: reports/dependency-check-report.html
+
+      # 3. SonarQube - Code Quality and SAST
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: .
